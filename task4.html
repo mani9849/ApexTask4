@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Combined Web Project</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    header {
+      background: #333;
+      color: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #555;
+    }
+    /* To-Do Styles */
+    #taskList li {
+      cursor: pointer;
+      margin: 5px 0;
+    }
+    /* Product List Styles */
+    .filters {
+      margin-bottom: 10px;
+    }
+    .product {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    @media (max-width: 600px) {
+      nav a {
+        display: block;
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Mani's Combined Web Project</h1>
+    <nav>
+      <a onclick="showSection('about')">About Me</a>
+      <a onclick="showSection('todo')">To-Do List</a>
+      <a onclick="showSection('products')">Product Page</a>
+      <a onclick="showSection('contact')">Contact</a>
+    </nav>
+  </header>
+
+  <!-- About Section -->
+  <section id="about" class="active">
+    <h2>About Me</h2>
+    <p>I’m Mani, an MCA student and aspiring DevOps & Web Developer. I enjoy creating responsive websites and building mini-projects with HTML, CSS, and JavaScript.</p>
+    <h3>Projects</h3>
+    <ul>
+      <li>To-Do List App with Local Storage</li>
+      <li>Product Listing Page with Filtering</li>
+    </ul>
+  </section>
+
+  <!-- To-Do List Section -->
+  <section id="todo">
+    <h2>To-Do List</h2>
+    <input id="task" placeholder="Enter a task" />
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </section>
+
+  <!-- Product Listing Section -->
+  <section id="products">
+    <h2>Product Listing</h2>
+    <div class="filters">
+      <label>Category:
+        <select id="categoryFilter">
+          <option value="all">All</option>
+          <option value="mobile">Mobile</option>
+          <option value="laptop">Laptop</option>
+        </select>
+      </label>
+      <label>Sort:
+        <select id="sortPrice">
+          <option value="low-high">Low to High</option>
+          <option value="high-low">High to Low</option>
+        </select>
+      </label>
+    </div>
+    <div id="productList"></div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2>Contact Me</h2>
+    <p>Email: manikanta@example.com</p>
+    <p>Phone: +91-XXXXXXXXXX</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Mani Kanta</p>
+  </footer>
+
+  <script>
+    // Tab Switching
+    function showSection(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    // To-Do List App
+    const taskList = document.getElementById("taskList");
+    function loadTasks() {
+      taskList.innerHTML = '';
+      let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      tasks.forEach((task, index) => {
+        let li = document.createElement("li");
+        li.textContent = task;
+        li.onclick = () => {
+          tasks.splice(index, 1);
+          localStorage.setItem("tasks", JSON.stringify(tasks));
+          loadTasks();
+        };
+        taskList.appendChild(li);
+      });
+    }
+    function addTask() {
+      const taskInput = document.getElementById("task");
+      const task = taskInput.value.trim();
+      if (task) {
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.push(task);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        taskInput.value = '';
+        loadTasks();
+      }
+    }
+    loadTasks();
+
+    // Product Listing App
+    const products = [
+      { name: "iPhone", category: "mobile", price: 800 },
+      { name: "Samsung", category: "mobile", price: 600 },
+      { name: "MacBook", category: "laptop", price: 1200 },
+      { name: "Dell", category: "laptop", price: 900 }
+    ];
+    const categoryFilter = document.getElementById("categoryFilter");
+    const sortPrice = document.getElementById("sortPrice");
+    const productList = document.getElementById("productList");
+
+    function displayProducts() {
+      let filtered = products.filter(p =>
+        categoryFilter.value === "all" || p.category === categoryFilter.value
+      );
+      if (sortPrice.value === "low-high") {
+        filtered.sort((a, b) => a.price - b.price);
+      } else {
+        filtered.sort((a, b) => b.price - a.price);
+      }
+      productList.innerHTML = '';
+      filtered.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `<h3>${p.name}</h3><p>Category: ${p.category}</p><p>Price: ₹${p.price}</p>`;
+        productList.appendChild(div);
+      });
+    }
+    categoryFilter.onchange = displayProducts;
+    sortPrice.onchange = displayProducts;
+    displayProducts();
+  </script>
+
+</body>
+</html>
